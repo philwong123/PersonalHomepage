@@ -5,6 +5,7 @@
 <template>
   <div id="app" v-if="initial">
     <githubConner />
+    <h2 >虎头家的新网站</h2>
     <el-row class="loginRow">
       <login
         :user_id="user_id"
