@@ -108,3 +108,4 @@ backend/app/news/json
 /wallpapers
 *.crt
 *.key
+*.json

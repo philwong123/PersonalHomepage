@@ -6,7 +6,8 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 from peewee import DoesNotExist
-
+import sys
+# sys.path.append(r'C:\\code\\PersonalHomepage\\backend')
 from app.model.gold_price_model import gold_price
 from app.model.widget_model import widget
 from app.login.login_funtion import User
@@ -22,13 +23,14 @@ def get_gold_price():
     '''
     for x in range(5):
         response = requests.get("http://www.dyhjw.com/hjtd")
+        response.encoding='utf-8'
         soup = BeautifulSoup(response.text, 'lxml')
 
         divs = soup.find(class_='nom last green')
         if not divs:
             divs = soup.find(class_='nom last red')
             if not divs:
-                divs = soup.find(class_='nom last ')
+                divs = soup.find(class_='nom last')
                 if not divs:
                     print('=' * 20 + str(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))) + '=' * 20)
                     print(str(soup))
@@ -46,6 +48,14 @@ def get_gold_price():
     else:
         return None
 
+def get_gold_price_new():
+    '''
+    返回当前黄金价格
+    '''
+    response = requests.get("http://www.dyhjw.com/hjtd")
+    soup = BeautifulSoup(response.text, 'lxml')
+    date = soup.find(class_='time nowTime').get_text()
+    print(date)
 
 def save_2_db(price):
     gold_price.create(price=price, update_time=datetime.datetime.now())
@@ -77,6 +87,7 @@ def gold_price_push_generator(price):
 
 
 if __name__ == '__main__':
+    # get_gold_price_new()
     current_hour = int(time.strftime('%H', time.localtime(time.time())))
     current_minute = int(time.strftime('%M', time.localtime(time.time())))
     current_time = current_hour + current_minute / 100
