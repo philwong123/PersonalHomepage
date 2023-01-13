@@ -4,13 +4,14 @@ import datetime
 import threading
 
 import sys
-
+# sys.path.append(r'C:\\code\\PersonalHomepage\\backend')
 from app.common_func import CommonFunc
 
 from app.model.widget_model import widget
 
 from app.model.fund_model import fund as fund_table
 from app.model.fund_model import fund_price, fund_belong
+from app.push.push_function import PushList, PushData
 
 cf = CommonFunc()
 
@@ -108,7 +109,6 @@ def fund_push_generator():
 
 
 if __name__ == '__main__':
-    from app.push.push_function import PushList, PushData
     valid_fund_list = get_valid_fund()
     threads = []
     for x in range(len(valid_fund_list)):

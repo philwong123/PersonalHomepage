@@ -53,7 +53,7 @@ def get():
         files = os.listdir(NEWS_JSON_PATH)
         for file in files:
             file_path = os.path.join(NEWS_JSON_PATH, file)
-            temp[file] = json.load(open(file_path))
+            temp[file] = json.load(open(file_path, encoding='utf-8'))
         r.append({'title': '什么值得买', 'data': [temp.pop('smzdm_article_today.json'), temp.pop('smzdm_article_week.json'), temp.pop('smzdm_article_month.json')]})
         r.append({'title': '知乎', 'data': [temp.pop('zhihu_daily.json'), temp.pop('zhihu_good.json'), temp.pop('zhihu_hot.json')]})
         r.append({'title': '微信', 'data': [temp.pop('weixin_hot.json'), temp.pop('weixin.json')]})
@@ -132,7 +132,7 @@ def flush():
             t.join()
         for file in file_path:
             file_path = os.path.join(NEWS_JSON_PATH, file)
-            result.append(json.load(open(file_path)))
+            result.append(json.load(open(file_path, encoding='utf-8')))
         return rsp.success(result)
     except Exception as e:
         traceback.print_exc()

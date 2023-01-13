@@ -36,12 +36,15 @@ def check_fund_exist(fund):
 @permission_required(URL_PREFIX + '/add')
 def add():
     try:
+        data = request.get_json()
         user_id = request.get_json()['user_id']
         code = request.get_json()['code']
         name = request.get_json()['name']
         push = int(request.get_json()['push'])
         threshold_max = float(request.get_json()['threshold_max'])
         threshold_min = float(request.get_json()['threshold_min'])
+        # threshold_max = float(request.get_json()['threshold_max']) if 'threshold_max' in request.get_json() else 0
+        # threshold_min = float(request.get_json()['threshold_min']) if 'threshold_min' in request.get_json() else 0
 
         s = Fund(code=code, name=name)
         fund_id = check_fund_exist(s)

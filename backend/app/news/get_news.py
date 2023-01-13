@@ -2,7 +2,7 @@
 import os
 import re
 import sys
-
+# sys.path.append(r'C:\\code\\PersonalHomepage\\backend')
 import time
 import json
 import base64
@@ -24,7 +24,8 @@ NEWS_JSON_PATH = ConfigHelper().get('BASE_PATH') + '/backend/app/news/json'
 dir = os.path.dirname(os.path.abspath(__file__)) + "/json/"
 
 try:
-    os.mkdir(dir)
+    if not os.path.exists(dir):
+        os.mkdir(dir)
 except Exception as e:
     traceback.print_exc()
     print("json文件夹创建失败(已存在或无写入权限)")
@@ -801,9 +802,10 @@ def parse_huxiu():
         def class_filter(class_text):
             return (class_text is not None) and ((class_text == "article-item--large") or ('article-item--normal' in class_text))
 
-        for soup_a in soup.find_all(class_=class_filter):
+        for soup_a in soup.find_all(class_="article-item-wrap tibt-card"):
             blist = {}
-            hot_name = soup_a.find('h5').text.replace("\\n", "").replace("\n", "").replace("\\r", "").replace("\r", "").strip()
+            # hot_name = soup_a.find('h5').text.replace("\\n", "").replace("\n", "").replace("\\r", "").replace("\r", "").strip()
+            hot_name = soup_a.find(class_='title multi-line-overflow').get_text()
             hot_url = soup_a.find('a').get('href')
             if not hot_url.startswith('https://www.huxiu.com'):
                 hot_url = 'https://www.huxiu.com' + hot_url
@@ -892,23 +894,32 @@ def parse_zaobao():
 #澎湃新闻
 def parse_thepaper():
     try:
-        url = "https://www.thepaper.cn/load_chosen.jsp"
+        # url = "https://www.thepaper.cn/load_chosen.jsp"
+        url = "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar"
         headers = {'Referer': 'https://www.thepaper.cn/', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
         fname = dir + "thepaper.json"
         r = requests.get(url, headers=headers, timeout=(5, 10))
         r.encoding = 'utf-8'
-        soup = etree.HTML(r.text)
+        # soup = etree.HTML(r.text)
+        hot_news = json.loads(r.text)["data"]["hotNews"]
         list = []
         jsondict = {}
         jsondict['website'] = 'thepaper'
         list_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         jsondict["time"] = list_time
         jsondict["title"] = "澎湃新闻"
-        for soup_a in soup.xpath("//div[@class='news_li']/h2/a"):
+        # for soup_a in soup.xpath("//div[@class=mdCard"):
+        #     blist = {}
+        #     hot_name = soup_a.text.replace("\\n", "").replace("\n", "").replace("\\r", "").replace("\r", "").strip()
+        #     hot_url = "https://www.thepaper.cn/" + soup_a.get('href')
+        #     group = "thepaper"
+        #     blist["name"] = hot_name
+        #     blist["url"] = hot_url
+        #     list.append(blist)
+        for news in hot_news:
             blist = {}
-            hot_name = soup_a.text.replace("\\n", "").replace("\n", "").replace("\\r", "").replace("\r", "").strip()
-            hot_url = "https://www.thepaper.cn/" + soup_a.get('href')
-            group = "thepaper"
+            hot_name = news["name"]
+            hot_url = "https://www.thepaper.cn/newsDetail_forward_" + news["contId"]
             blist["name"] = hot_name
             blist["url"] = hot_url
             list.append(blist)
