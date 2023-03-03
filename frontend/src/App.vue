@@ -5,7 +5,8 @@
 <template>
   <div id="app" v-if="initial">
     <githubConner />
-    <h2 >虎头家的新网站</h2>
+<!--    <h2 >虎头家的新网站</h2>-->
+    <img src="./tiger.jpg" width="200px" height="100px" />
     <el-row class="loginRow">
       <login
         :user_id="user_id"
