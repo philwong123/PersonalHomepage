@@ -8,15 +8,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+const TerserPlugin = require('terser-webpack-plugin')
 
 // For NamedChunksPlugin
 const seen = new Set()
 const nameLength = 4
 
 const prodWebpackConfig = merge(baseWebpackConfig, {
-    // webpack 4.x add
     mode: 'production',
 
     output: {
@@ -27,27 +25,24 @@ const prodWebpackConfig = merge(baseWebpackConfig, {
     },
 
     module: {
-        // add style loader
         rules: utils.styleLoaders({
             sourceMap: false,
             extract: true,
             usePostCSS: true
         })
     },
+
     plugins: [
-        // define plugin
         new webpack.DefinePlugin({
             'process.env': require('../config/prod.env')
         }),
 
-        // extract css into its own file
         new MiniCssExtractPlugin({
             filename: utils.assetsPath('css/[name].[contenthash:8].css'),
             chunkFilename: utils.assetsPath('css/[name].[contenthash:8].css')
         }),
 
         new HtmlWebpackPlugin({
-            //
             filename: config.build.index,
             template: 'src/index.html',
             inject: true,
@@ -62,12 +57,9 @@ const prodWebpackConfig = merge(baseWebpackConfig, {
         }),
 
         new ScriptExtHtmlWebpackPlugin({
-            //`runtime` must same as runtimeChunk name. default is `runtime`
             inline: /runtime\..*\.js$/
         }),
 
-        // keep chunk.id stable when chunk has no name
-        //
         new webpack.NamedChunksPlugin(chunk => {
             if (chunk.name) {
                 return chunk.name
@@ -85,12 +77,10 @@ const prodWebpackConfig = merge(baseWebpackConfig, {
             }
         }),
 
-        // keep module.id stable when vender modules does not change
         new webpack.HashedModuleIdsPlugin(),
     ],
 
     optimization: {
-        // split chunks
         splitChunks: {
             chunks: 'all',
             cacheGroups: {
@@ -98,39 +88,39 @@ const prodWebpackConfig = merge(baseWebpackConfig, {
                     name: 'chunk-libs',
                     test: /[\\/]node_modules[\\/]/,
                     priority: 10,
-                    chunks: 'initial' // 只打包初始时依赖的第三方
+                    chunks: 'initial'
                 },
                 elementUI: {
-                    name: 'chunk-elementUI', // 单独将 elementUI 拆包
-                    priority: 20, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
+                    name: 'chunk-elementUI',
+                    priority: 20,
                     test: /[\\/]node_modules[\\/]element-ui[\\/]/
-                },
-                /*commons: {
-                    name: 'chunk-commons',
-                    test: path.resolve(__dirname, '../src/components'), // 可自定义拓展你的规则
-                    minChunks: 3, // 最小公用次数
-                    priority: 5,
-                    reuseExistingChunk: true
-                }*/
+                }
             }
         },
 
         runtimeChunk: 'single',
 
         minimizer: [
-            // uglify js plugin
-            new UglifyJsPlugin({
-                uglifyOptions: {
+            new TerserPlugin({
+                terserOptions: {
+                    ecma: 8,  // 使用 ES8 语法
+                    compress: {
+                        warnings: false,
+                        drop_console: true,  // 移除 console
+                        drop_debugger: true  // 移除 debugger
+                    },
                     mangle: {
                         safari10: true
+                    },
+                    output: {
+                        comments: false  // 移除注释
                     }
                 },
-                cache: true,
-                parallel: true
+                parallel: true,  // 并行处理
+                cache: true,     // 启用缓存
+                sourceMap: false // 不生成 sourceMap
             }),
 
-            // Compress extracted CSS. We are using this plugin so that possible
-            // duplicated CSS from different components can be deduped.
             new OptimizeCSSAssetsPlugin()
         ]
     }
