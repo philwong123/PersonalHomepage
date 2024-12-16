@@ -4,6 +4,7 @@ from flask import Flask
 from flask_cors import CORS
 from app.model.model_function import BaseDb
 from playhouse.flask_utils import FlaskDB
+from app.base_model import db
 
 
 def create_app(config_name):
@@ -74,4 +75,14 @@ def create_app(config_name):
     from .news import news as news_blueprint
     app.register_blueprint(news_blueprint, url_prefix='/news')
 
+    @app.before_request
+    def _db_connect():
+        if db.is_closed():
+            db.connect()
+
+    @app.teardown_request
+    def _db_close(exc):
+        if not db.is_closed():
+            db.close()
+            
     return app

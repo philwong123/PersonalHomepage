@@ -6,6 +6,13 @@ bind = "127.0.0.1:5000"
 # 工作进程数
 workers = multiprocessing.cpu_count() * 2 + 1
 
+# 每个工作进程的线程数
+threads = 2
+
+# 最大请求数
+max_requests = 1000
+max_requests_jitter = 50
+
 # 工作模式
 worker_class = 'sync'
 
