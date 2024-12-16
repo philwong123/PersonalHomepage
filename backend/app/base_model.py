@@ -15,20 +15,22 @@ import configparser
 import os
 from config import Config
 
-# 读取配置
+# 读取配置文件
 cf = configparser.ConfigParser()
-cf.read('app/homepage.config')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(os.path.dirname(current_dir), 'config.ini')
+cf.read(config_path)
 
-# 修改连接池配置
+# 使用配置文件中的数据库配置
 db = PooledMySQLDatabase(
-    database=Config.DB_NAME,
+    database=cf.get('database', 'DB_NAME'),
     max_connections=32,
     stale_timeout=300,
     timeout=None,
-    user=Config.DB_USER,
-    password=Config.DB_PASS,
-    host=Config.DB_HOST,
-    port=Config.DB_PORT
+    user=cf.get('database', 'DB_USER'),
+    password=cf.get('database', 'DB_PASS'),
+    host=cf.get('database', 'DB_HOST'),
+    port=int(cf.get('database', 'DB_PORT'))
 )
 
 class BaseModel(Model):
