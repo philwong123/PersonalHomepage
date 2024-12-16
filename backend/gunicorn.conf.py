@@ -27,7 +27,7 @@ accesslog = '../logs/access.log'
 errorlog = '../logs/error.log'
 
 # 日志级别
-loglevel = 'info'
+loglevel = 'debug'
 
 # 后台运行
 daemon = True
