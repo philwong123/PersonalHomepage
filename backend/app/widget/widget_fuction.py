@@ -45,6 +45,7 @@ class Widget(Base):
 
 
 def widget_suite_get(user_id):
+    logger.debug(f"Getting widget suite for user_id: {user_id}")
     return [{
         'id': s_['id'],
         'name': s_['name'],
