@@ -13,23 +13,32 @@ from peewee import Model
 from playhouse.pool import PooledMySQLDatabase
 import configparser
 import os
+from config import Config
 
 # 读取配置文件
 cf = configparser.ConfigParser()
 current_dir = os.path.dirname(os.path.abspath(__file__))
-config_path = os.path.join(os.path.dirname(current_dir), 'config.ini')
+config_path = os.path.join(os.path.dirname(current_dir), 'homepage.config')
+
+# 添加调试信息
+print(f"Looking for config file at: {config_path}")
+print(f"File exists: {os.path.exists(config_path)}")
+
+if not os.path.exists(config_path):
+    raise FileNotFoundError(f"Config file not found at {config_path}")
+
 cf.read(config_path)
 
 # 使用配置文件中的数据库配置
 db = PooledMySQLDatabase(
-    database=cf.get('database', 'DB_NAME'),
+    'PersonalHomepage',  # 数据库名称
     max_connections=32,
     stale_timeout=300,
     timeout=None,
-    user=cf.get('database', 'DB_USER'),
-    password=cf.get('database', 'DB_PASS'),
-    host=cf.get('database', 'DB_HOST'),
-    port=int(cf.get('database', 'DB_PORT'))
+    user=cf.get('config', 'DB_USER'),
+    password=cf.get('config', 'DB_PASS'),
+    host=cf.get('config', 'DB_HOST'),
+    port=int(cf.get('config', 'DB_PORT'))
 )
 
 class BaseModel(Model):
