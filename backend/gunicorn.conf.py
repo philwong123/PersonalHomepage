@@ -1,4 +1,7 @@
 import multiprocessing
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 监听地址和端口
 bind = "127.0.0.1:5000"
@@ -37,3 +40,37 @@ timeout = 30
 
 # 重载
 reload = True
+
+# 日志配置
+loglevel = 'debug'
+accesslog = "../logs/gunicorn_access.log"
+errorlog = "../logs/gunicorn_error.log"
+access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(L)s'
+
+# 设置日志格式
+logconfig_dict = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': '../logs/app.log',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        }
+    }
+}

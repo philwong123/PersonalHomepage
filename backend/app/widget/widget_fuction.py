@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from ..base_model import Base
 from ..common_func import CommonFunc
@@ -8,6 +9,7 @@ from ..model.widget_model import widget_suite
 from ..model.widget_model import widget as widget_table
 
 cf = CommonFunc()
+logger = logging.getLogger(__name__)
 
 
 class Widget(Base):
@@ -62,18 +64,36 @@ def widget_suite_delete(user_id):
 
 def widget_get(user_id, suite_id):
     try:
+        logger.debug(f"Getting widget for user_id={user_id}, suite_id={suite_id}")
         _ = widget_suite.get(widget_suite.id == suite_id)
+        
         if int(_.user_id) != int(user_id):
+            logger.warning(f"User {user_id} tried to access suite {suite_id} belonging to user {_.user_id}")
             return []
+            
         widget_id_list = eval(_.detail)
+        logger.debug(f"Found widget_id_list: {widget_id_list}")
+        
         result = []
         for widget_id in widget_id_list:
-            widget = Widget(id=widget_id).complete()
-            if widget is not None:
-                result.append(cf.attr_to_dict(widget))
+            try:
+                widget = Widget(id=widget_id).complete()
+                if widget is not None:
+                    result.append(cf.attr_to_dict(widget))
+                else:
+                    logger.warning(f"Widget {widget_id} not found")
+            except Exception as e:
+                logger.error(f"Error processing widget {widget_id}: {str(e)}")
+                
+        logger.debug(f"Returning {len(result)} widgets")
         return result
+        
     except widget_suite.DoesNotExist:
+        logger.error(f"Widget suite {suite_id} not found")
         return []
+    except Exception as e:
+        logger.error(f"Unexpected error in widget_get: {str(e)}")
+        raise
 
 
 def widget_all():
