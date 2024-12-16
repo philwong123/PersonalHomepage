@@ -61,11 +61,19 @@ def widget_suite_delete(user_id):
 
 
 def widget_get(user_id, suite_id):
-    _ = widget_suite.get(widget_suite.id == suite_id)
-    if int(_.user_id) != int(user_id):
+    try:
+        _ = widget_suite.get(widget_suite.id == suite_id)
+        if int(_.user_id) != int(user_id):
+            return []
+        widget_id_list = eval(_.detail)
+        result = []
+        for widget_id in widget_id_list:
+            widget = Widget(id=widget_id).complete()
+            if widget is not None:
+                result.append(cf.attr_to_dict(widget))
+        return result
+    except widget_suite.DoesNotExist:
         return []
-    widget_id_list = eval(_.detail)
-    return [cf.attr_to_dict(Widget(id=widget_id).complete()) for widget_id in widget_id_list]
 
 
 def widget_all():

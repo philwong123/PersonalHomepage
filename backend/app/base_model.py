@@ -13,7 +13,7 @@ from peewee import Model
 from playhouse.pool import PooledMySQLDatabase
 import configparser
 import os
-from config import Config
+#from config import Config
 
 # 读取配置文件
 cf = configparser.ConfigParser()
