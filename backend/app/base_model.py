@@ -18,7 +18,7 @@ from config import Config
 # 读取配置文件
 cf = configparser.ConfigParser()
 current_dir = os.path.dirname(os.path.abspath(__file__))
-config_path = os.path.join(os.path.dirname(current_dir), 'homepage.config')
+config_path = os.path.join(current_dir, 'homepage.config')
 
 # 添加调试信息
 print(f"Looking for config file at: {config_path}")
@@ -41,7 +41,7 @@ db = PooledMySQLDatabase(
     port=int(cf.get('config', 'DB_PORT'))
 )
 
-class BaseModel(Model):
+class Base(Model):
     class Meta:
         database = db
 
