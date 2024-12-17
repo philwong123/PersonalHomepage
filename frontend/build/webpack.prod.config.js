@@ -80,6 +80,7 @@ const prodWebpackConfig = merge(baseWebpackConfig, {
         new webpack.HashedModuleIdsPlugin(),
     ],
 
+
     optimization: {
         splitChunks: {
             chunks: 'all',
@@ -103,22 +104,22 @@ const prodWebpackConfig = merge(baseWebpackConfig, {
         minimizer: [
             new TerserPlugin({
                 terserOptions: {
-                    ecma: 8,  // 使用 ES8 语法
+                    ecma: 8,
+                    warnings: false,
+                    parse: {},
                     compress: {
-                        warnings: false,
-                        drop_console: true,  // 移除 console
-                        drop_debugger: true  // 移除 debugger
+                        drop_console: true,
+                        drop_debugger: true,
+                        pure_funcs: ['console.log'] // 移除console
                     },
                     mangle: {
                         safari10: true
-                    },
-                    output: {
-                        comments: false  // 移除注释
                     }
                 },
-                parallel: true,  // 并行处理
-                cache: true,     // 启用缓存
-                sourceMap: false // 不生成 sourceMap
+                sourceMap: false,
+                parallel: true,
+                cache: true,
+                extractComments: false
             }),
 
             new OptimizeCSSAssetsPlugin()
