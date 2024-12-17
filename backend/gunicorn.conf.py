@@ -1,7 +1,5 @@
+import os
 import multiprocessing
-import logging
-
-logger = logging.getLogger(__name__)
 
 # 监听地址和端口
 bind = "127.0.0.1:5000"
@@ -17,7 +15,7 @@ max_requests = 1000
 max_requests_jitter = 50
 
 # 工作模式
-worker_class = 'sync'
+worker_class = 'gthread'
 
 # 最大客户端并发数量
 worker_connections = 2000
@@ -28,6 +26,8 @@ pidfile = '../logs/gunicorn.pid'
 # 访问日志和错误日志
 accesslog = '../logs/access.log'
 errorlog = '../logs/error.log'
+capture_output = True  # 捕获应用程序的标准输出
+enable_stdio_inheritance = True  # 继承标准输出
 
 # 日志级别
 loglevel = 'debug'
@@ -41,19 +41,13 @@ timeout = 30
 # 重载
 reload = True
 
-# 日志配置
-loglevel = 'debug'
-accesslog = "../logs/gunicorn_access.log"
-errorlog = "../logs/gunicorn_error.log"
-access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(L)s'
-
 # 设置日志格式
 logconfig_dict = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '%(asctime)s [%(levelname)s] [%(process)d] %(name)s: %(message)s'
         },
     },
     'handlers': {
@@ -63,14 +57,19 @@ logconfig_dict = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': '../logs/app.log',
+            'filename': '../logs/backend.log',
             'formatter': 'verbose'
         }
     },
     'loggers': {
-        '': {
+        '': {  # root logger
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
+        },
+        'app': {  # 应用程序logger
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False
         }
     }
 }
